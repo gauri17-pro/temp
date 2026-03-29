@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: attendance-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/gauri17-pro/temp.git
+    targetRevision: HEAD
+    path: attendance-app-chart
+    helm:
+      releaseName: attendance-app-release
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: attendance-app
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
