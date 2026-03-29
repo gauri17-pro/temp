@@ -61,7 +61,7 @@ config:
   # This is for setting up a configmap more information can be found here: https://kubernetes.io/docs/concepts/configuration/configmap/
   DB_HOST: "database-1.cluster-cjo2qwqge1cu.ap-south-1.rds.amazonaws.com"
   DB_NAME: "postgres"
-  DB_PORT: "5432"
+  DB_PORT: 5432
 
 docker:
   name: docker-creds
