@@ -1,0 +1,9 @@
+apiVersion: apps/v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.config.name }}
+  namespace: {{ .Values.namespace }}
+data:
+  DB_HOST: {{ .Values.config.DB_HOST }}
+  DB_NAME: {{ .Values.config.DB_NAME }}
+  DB_PORT: {{ .Values.config.DB_PORT }}

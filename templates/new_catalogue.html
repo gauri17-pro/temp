@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+{% block title %}New Catalogue — AttendTrack{% endblock %}
+
+{% block extra_css %}
+<style>
+  .nc-page {
+    min-height: calc(100vh - 64px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 3rem 1.5rem; position: relative; overflow: hidden;
+  }
+  .nc-page::before {
+    content: ''; position: fixed;
+    width: 600px; height: 600px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(79,255,176,0.06) 0%, transparent 65%);
+    top: -100px; right: -150px; pointer-events: none;
+  }
+  .nc-page::after {
+    content: ''; position: fixed;
+    width: 500px; height: 500px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(123,97,255,0.07) 0%, transparent 65%);
+    bottom: -100px; left: -100px; pointer-events: none;
+  }
+  .nc-card {
+    width: 100%; max-width: 580px;
+    position: relative; z-index: 1;
+    animation: ncFadeUp 0.45s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  @keyframes ncFadeUp {
+    from { opacity:0; transform: translateY(24px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  .nc-breadcrumb {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.78rem; color: var(--text-dim); margin-bottom: 1.75rem;
+  }
+  .nc-breadcrumb a { color: var(--text-muted); text-decoration: none; transition: color .15s; }
+  .nc-breadcrumb a:hover { color: var(--accent); }
+  .nc-header {
+    margin-bottom: 2rem; padding-bottom: 1.75rem;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 1rem;
+  }
+  .nc-icon-wrap {
+    width: 52px; height: 52px; flex-shrink: 0; border-radius: 14px;
+    background: linear-gradient(135deg, rgba(79,255,176,0.15), rgba(123,97,255,0.12));
+    border: 1px solid rgba(79,255,176,0.2);
+    display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+  }
+  .nc-header-text h1 {
+    font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800;
+    letter-spacing: -0.03em; margin-bottom: 4px;
+  }
+  .nc-header-text p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+  .nc-form-body {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 18px; padding: 2rem;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+  }
+  .nc-field { position: relative; margin-bottom: 1.25rem; }
+  .nc-field input {
+    width: 100%; background: var(--surface2);
+    border: 1.5px solid var(--border); border-radius: 12px;
+    color: var(--text); padding: 20px 48px 8px 16px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+    outline: none; transition: border-color .2s, box-shadow .2s; box-sizing: border-box;
+  }
+  .nc-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,255,176,0.08); }
+  .nc-field input::placeholder { color: transparent; }
+  .nc-field label {
+    position: absolute; left: 16px; top: 15px;
+    font-size: 0.875rem; color: var(--text-dim);
+    pointer-events: none; transform-origin: left top;
+    transition: transform .18s, color .18s;
+  }
+  .nc-field input:focus + label,
+  .nc-field input:not(:placeholder-shown) + label {
+    transform: translateY(-8px) scale(0.72); color: var(--accent);
+  }
+  .nc-field .nc-field-icon {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    font-size: 1.1rem; color: var(--text-dim); pointer-events: none; transition: color .2s;
+  }
+  .nc-field input:focus ~ .nc-field-icon { color: var(--accent); }
+
+  .nc-chip-label {
+    font-size: 0.72rem; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: .07em; margin-bottom: .6rem;
+  }
+  .nc-chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; }
+  .nc-chip {
+    padding: 6px 14px; border-radius: 20px;
+    border: 1px solid var(--border); background: var(--surface2);
+    color: var(--text-muted); font-size: 0.8rem;
+    cursor: pointer; transition: all .18s; user-select: none;
+  }
+  .nc-chip:hover { border-color: var(--accent); color: var(--accent); background: rgba(79,255,176,0.06); }
+  .nc-chip.selected { border-color: var(--accent); background: rgba(79,255,176,0.12); color: var(--accent); font-weight: 600; }
+
+  .nc-preview {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1rem 1.25rem;
+    display: flex; align-items: center; gap: .85rem;
+    margin-bottom: 1.5rem; min-height: 64px; transition: border-color .2s;
+  }
+  .nc-preview.has-data { border-color: rgba(79,255,176,0.3); }
+  .nc-preview-icon {
+    width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px;
+    background: linear-gradient(135deg, rgba(79,255,176,0.15), rgba(123,97,255,0.1));
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  }
+  .nc-preview-name { font-family:'Syne',sans-serif; font-size:.95rem; font-weight:700; color:var(--text); letter-spacing:-.01em; }
+  .nc-preview-subject { font-size:.78rem; color:var(--text-muted); margin-top:2px; }
+  .nc-preview-empty { font-size:.82rem; color:var(--text-dim); }
+
+  .nc-actions { display: flex; gap: .75rem; align-items: center; }
+  .nc-submit {
+    flex: 1; padding: 13px;
+    background: var(--accent); color: #0d0f14;
+    border: none; border-radius: 11px;
+    font-family: 'Syne', sans-serif; font-size: .95rem; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background .15s, transform .15s, box-shadow .15s; letter-spacing: -.01em;
+  }
+  .nc-submit:hover { background: #3de89e; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(79,255,176,0.28); }
+  .nc-submit:active { transform: translateY(0); }
+  .nc-submit:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .nc-cancel {
+    padding: 13px 20px; background: transparent; color: var(--text-muted);
+    border: 1px solid var(--border); border-radius: 11px;
+    font-family: 'DM Sans', sans-serif; font-size: .875rem; font-weight: 500;
+    cursor: pointer; text-decoration: none; display: flex; align-items: center;
+    transition: color .15s, border-color .15s, background .15s;
+  }
+  .nc-cancel:hover { color: var(--text); border-color: var(--text-dim); background: var(--surface2); }
+
+  .nc-tips { margin-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; }
+  .nc-tip {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: .75rem 1rem;
+    font-size: .78rem; color: var(--text-muted);
+    display: flex; gap: 8px; align-items: flex-start;
+    animation: ncFadeUp .5s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .nc-tip:nth-child(1) { animation-delay:.1s; }
+  .nc-tip:nth-child(2) { animation-delay:.2s; }
+  .nc-tip-icon { font-size:.9rem; flex-shrink:0; margin-top:1px; }
+  .nc-tip strong { color:var(--text); font-weight:500; display:block; margin-bottom:2px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="nc-page">
+  <div class="nc-card">
+
+    <div class="nc-breadcrumb">
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <span>›</span>
+      <span>New Catalogue</span>
+    </div>
+
+    <div class="nc-header">
+      <div class="nc-icon-wrap">🗂</div>
+      <div class="nc-header-text">
+        <h1>New Catalogue</h1>
+        <p>Create a class catalogue to start tracking attendance for your students.</p>
+      </div>
+    </div>
+
+    <div class="nc-form-body">
+      <form method="POST" id="ncForm">
+
+        <!-- Live Preview -->
+        <div class="nc-preview" id="ncPreview">
+          <div class="nc-preview-icon">🗂</div>
+          <div id="ncPreviewText">
+            <div class="nc-preview-empty">Your catalogue preview will appear here…</div>
+          </div>
+        </div>
+
+        <!-- Class Name -->
+        <div class="nc-field">
+          <input type="text" name="name" id="ncName"
+                 placeholder="Class Name" required autocomplete="off"
+                 oninput="updatePreview()">
+          <label for="ncName">Class / Catalogue Name</label>
+          <span class="nc-field-icon">✏️</span>
+        </div>
+
+        <!-- Subject -->
+        <div class="nc-field">
+          <input type="text" name="subject" id="ncSubject"
+                 placeholder="Subject" required autocomplete="off"
+                 oninput="updatePreview()">
+          <label for="ncSubject">Subject</label>
+          <span class="nc-field-icon">📚</span>
+        </div>
+
+        <!-- Quick-pick chips -->
+        <div class="nc-chip-label">Quick pick a subject</div>
+        <div class="nc-chips">
+          <div class="nc-chip" onclick="pickSubject('Mathematics')">Mathematics</div>
+          <div class="nc-chip" onclick="pickSubject('Physics')">Physics</div>
+          <div class="nc-chip" onclick="pickSubject('Chemistry')">Chemistry</div>
+          <div class="nc-chip" onclick="pickSubject('Biology')">Biology</div>
+          <div class="nc-chip" onclick="pickSubject('English')">English</div>
+          <div class="nc-chip" onclick="pickSubject('History')">History</div>
+          <div class="nc-chip" onclick="pickSubject('Computer Science')">Computer Science</div>
+          <div class="nc-chip" onclick="pickSubject('Geography')">Geography</div>
+        </div>
+
+        <div class="nc-actions">
+          <button type="submit" class="nc-submit" id="ncSubmit" disabled>
+            Create Catalogue →
+          </button>
+          <a href="{{ url_for('dashboard') }}" class="nc-cancel">Cancel</a>
+        </div>
+      </form>
+    </div>
+
+    <div class="nc-tips">
+      <div class="nc-tip">
+        <span class="nc-tip-icon">💡</span>
+        <div><strong>Naming tip</strong>Use names like "Class 10-A 2024" for easy identification.</div>
+      </div>
+      <div class="nc-tip">
+        <span class="nc-tip-icon">📅</span>
+        <div><strong>Date-wise records</strong>Attendance is tracked per day — edit any past date anytime.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  var nameEl    = document.getElementById('ncName');
+  var subjEl    = document.getElementById('ncSubject');
+  var preview   = document.getElementById('ncPreview');
+  var previewTx = document.getElementById('ncPreviewText');
+  var submitBtn = document.getElementById('ncSubmit');
+
+  function updatePreview() {
+    var n = nameEl.value.trim();
+    var s = subjEl.value.trim();
+    if (n || s) {
+      preview.classList.add('has-data');
+      previewTx.innerHTML =
+        '<div class="nc-preview-name">' + (n || '—') + '</div>' +
+        '<div class="nc-preview-subject">📚 ' + (s || '—') + '</div>';
+    } else {
+      preview.classList.remove('has-data');
+      previewTx.innerHTML = '<div class="nc-preview-empty">Your catalogue preview will appear here…</div>';
+    }
+    submitBtn.disabled = !(n && s);
+  }
+
+  function pickSubject(val) {
+    subjEl.value = val;
+    document.querySelectorAll('.nc-chip').forEach(function(c) {
+      c.classList.toggle('selected', c.textContent.trim() === val);
+    });
+    updatePreview();
+  }
+
+  subjEl.addEventListener('input', function() {
+    var v = this.value.trim();
+    document.querySelectorAll('.nc-chip').forEach(function(c) {
+      c.classList.toggle('selected', c.textContent.trim() === v);
+    });
+  });
+</script>
+{% endblock %}

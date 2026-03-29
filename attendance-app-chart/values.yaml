@@ -1,0 +1,74 @@
+# Default values for attendance-app-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+namespace: attendance-app
+
+deployment:
+  name: attendance-app-deployment
+  labels:
+    app: attendance-app
+
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 2
+
+# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  repository: gauris17/attendanceapp
+  # This sets the pull policy for images.
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "v1"
+
+# This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: 
+  - name: docker-creds
+
+
+# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
+service:
+  name: attendance-app-service  
+  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: LoadBalancer
+  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  port: 5000
+  labels:
+    app: attendance-app
+
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+autoscaling:
+  enabled: true
+  name: attendance-app-hpa
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+config:
+  name: attendance-app-config
+  # This is for setting up a configmap more information can be found here: https://kubernetes.io/docs/concepts/configuration/configmap/
+  DB_HOST: "database-1.cluster-cjo2qwqge1cu.ap-south-1.rds.amazonaws.com"
+  DB_NAME: "postgres"
+  DB_PORT: "5432"
+
+docker:
+  name: docker-creds
+  dockerConfigjson: AgCOLGqIMZsh3tzKKIU9XF5+6zREktx8MfgO2p4nkoFYIwoj80dgyzDovKZ9iPf2xomA9FWVMkTiuAIgyqDnw50kbrZCWTAYVfc0jprnmGsZMySHPmgB4tVn7D5AHAFT9plvG1J3jWVs9vmdb20ix4rZd3MII2PHeGA+I3/b+FF3NHIjEJ3JpGCktqBN63itVhV8uPe5MksuXBr7zKd8hdL7VwzeBiK7fRYsjaEJBoDVCoIlWA39y6yHhY2rWb0GFA6hH/xHO1Iuj23Y17OgsXsRRL8AxVqAyM28snLuOodHqoCeMEA9pM8qwGpnhQ5frf1AFHklcbgs6dhy9H9SRGX2zXqVKR99FiXPQJRzrP++z+jHXsfdw1gxMoYtbmkukcFg4a3R+Ps9ogz8vT+YhBsuKnbuI8VF2SdRYvTgcsaerUyb6fXs84gu1v0Z9Gd6nhy/l/cTBXoay31wIkVMRINXNyNa8K9KieQnSAv6ez73vx0hUmAKR6JMslp9do0vpNpfdeikU4q5FXa0ID4d+FPJV/eL1V25xzsVK3JKN3CgsuITVAqbJ9RAn21nr9t62lkY9RzNXJBGrw5d7/qkn/xNMgugGM2gBSIZ/S61xWj2OK/J6cfnpshAcNBMh8VoPm2GfH9ZGM8MfyfOTH6ZBCmtjSYIdbHACiN/GBew6Mj35r8GxMr2nnRzQg8aG1p9ncPoOcaEp6XOzVF1CTvvtQGXkiXUW8CyXUbRu6vDkMPjJ4+lDWNtD4dCnScrjhz3sc3rBDOnpjCKwcmAVYsIOurvK+xgumBNAd2eKGjqDJuPFAdUEPFTdrSs2LgPqXtjBFlmfUXj2yTLVgwq4ZU214mh+80CaP78R8YpnQ==
+
+db:
+  name: db-secrets
+  # This is for setting up a secret more information can be found here: https://kubernetes.io/docs/concepts/configuration/secret/
+  DB_USER: AgA8tre1hmQFdMTAju+b64HyEPQl9RnbCuiHiucJ8kc+Xf5x4xf68doO+jsmA83s4utt4Rq/xgtJObThvg4a+bTN1RxjJnCeHz9dj4YVccudnYFNzW3aldIIMnnlSEvOllB2w/BdtFmEqtgVLnJBZUvSC090rd2i1ul0fsnOpjvsBYjXFrgV08hJI4Z9jxeoaFMve4ZEYYC1Ajz8zwsZtuzFKcj4mwbOdZXRHcWxERcr3Qgi1IpTWGfw4FgaoyCjpphS7gWQk48a6qYCtHpZMbWnvuL47l4UpNytWwJCiferC3t1v1lb/HXVoPe6QHCqHQEhKJvJUhAVNwKwGbOJt3SeKt3C+64mif8IBNOpJRJ8gu5B7IlrB9xP0uaXunM2GsC0WWCJyjoPLHVj2zHOm27OfnFOKaPj+t4+txQLS1qmv09sxgiyOuysqrTVAXk+HsjzhR8J1O/u3DvOOEfoR/cy+0ozr4tlUuR4WwQ457s3rr7IdQlVt5fvUZ/2DSQ/dNGh6Vig34BnxV2hAkAiNl8BiHP1i+l5LYOuyWQ/IKmsvfA3X0YT8jjHegt5R7ksMIqh/A4lnYXjYOubETyrEbPQNswAZzCjVsHYs8Ug9bQvrLCsPW6E7j0ld537DZmzZzPhexkaPLjkWSP4ebCaTKZ05lN0X6v5YVmntfYdxlvwt4D5pJ4JOBUjZOMLMvkBqpTvjw1jwW1t4Q==
+  DB_PASSWORD: AgBS44EFW2G40KnMnwxgc3QD7izg4ufyMeYzkCjxbRee2yHwy00kIToyVddCSSi53sIjjJGs5irIBbl/RxmdgBf8KL1EpztOdJx+Dm0EmFm8Hzndp8xLRVf6R6gXi7tZ8GKBwDprAUZwB7kNoPFJApfZQYaI1MVwsRJpNFwkvgTzlbVRClL8lJl7pr/MaRzH+m5l5+bd/Kg0Wd5kaLkiRqniDszqDj6XgD6qApOZIMH41c6RJ9gZUy9e9Aq3HlS0mzx7SbKVqPZchUWnx1iv7UT+2dUJrI+jXbIJqVa/n9zmCPxtef8BR6y7A1ZrHr3hH2Lrr44Ox85tKgDTYshl6vjvAH/brQ2BjOf750XSiiujhSjUyjXPzT5FvkL0mEZ8J42pDJqC/+LJB5Nls3NjA021I8BTElKDWfmAbPGQcIuAszHLM0fpDhXIz4kl6lDbeXZKbm+rlr+YNQLtFyNRKJpwoYno1x1IVoK6U3+pK5nKA15DlKbPJZQEqwH4gmvnnFjmpMuVirc8zn8CFYg/M4jLY+9OSywwuc7J6uL4rEFMtYofFpGd8appVs68wpJh+zTOmjp3eTuJElv2BYwbX+NXNiabeL3fYqhy17q47yZC/xCd7+p76M/T7l0XzjF0lION3hcfZ8JzZVZjcpoggzfu4j75lrgXMzm2ojH0UKGjUQNKNRHIi5G6VU5WCW4f9+TFKCaZ082LTA==

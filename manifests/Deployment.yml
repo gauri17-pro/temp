@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: attendance-app-deployment
+  namespace: attendance-app
+  labels:
+    app: attendance-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: attendance-app
+  template: 
+    metadata:
+      labels:
+        app: attendance-app
+    spec:
+      containers:
+      - name: attendance-app-container
+        image: gauris17/attendanceapp:v1
+        ports:
+        - containerPort: 5000
+        envFrom:
+        - configMapRef:
+            name: attendance-app-config
+        - secretRef:
+            name: db-secrets
+      imagePullSecrets:
+      - name: docker-creds

@@ -1,0 +1,9 @@
+apiVersion: apps/v1
+kind: ConfigMap
+metadata:
+  name: attendance-app-config
+  namespace: attendance-app
+data:
+  DB_HOST: "database-1.cluster-cjo2qwqge1cu.ap-south-1.rds.amazonaws.com"
+  DB_NAME: "postgres"
+  DB_PORT: "5432"

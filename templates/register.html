@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+{% block title %}Register — AttendTrack{% endblock %}
+{% block extra_css %}
+<style>
+  body {
+    display: flex;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── Left Panel ── */
+  .left-panel {
+    width: 42%;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 3rem 3.5rem;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .left-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(79,255,176,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,255,176,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse at 30% 50%, black 30%, transparent 75%);
+  }
+
+  .left-panel::after {
+    content: '';
+    position: absolute;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(79,255,176,0.12) 0%, transparent 70%);
+    top: 50%; left: 20%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .left-content { position: relative; z-index: 1; }
+
+  .brand {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.03em;
+    margin-bottom: 3rem;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .brand span { color: var(--text); }
+
+  .left-headline {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.04em;
+    margin-bottom: 1rem;
+  }
+  .left-headline em { font-style: normal; color: var(--accent); }
+
+  .left-desc {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    max-width: 320px;
+    margin-bottom: 2.5rem;
+  }
+
+  .feature-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .feature-item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.85rem; color: var(--text-muted);
+    animation: fadeUp 0.5s ease both;
+  }
+  .feature-item:nth-child(1) { animation-delay: 0.1s; }
+  .feature-item:nth-child(2) { animation-delay: 0.2s; }
+  .feature-item:nth-child(3) { animation-delay: 0.3s; }
+  .feature-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); flex-shrink: 0;
+    box-shadow: 0 0 8px rgba(79,255,176,0.6);
+  }
+
+  /* ── Right Panel ── */
+  .right-panel {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    padding: 2rem;
+    background: var(--bg);
+    overflow-y: auto;
+  }
+
+  .register-box {
+    width: 100%; max-width: 420px;
+    animation: fadeUp 0.45s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .register-box h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.6rem; font-weight: 800;
+    letter-spacing: -0.03em; margin-bottom: 4px;
+  }
+  .register-box .sub { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 2rem; }
+
+  /* Steps */
+  .steps { display: flex; align-items: center; margin-bottom: 2rem; }
+  .step {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.75rem; font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    transition: color 0.3s;
+  }
+  .step.active { color: var(--accent); }
+  .step.done   { color: var(--text-muted); }
+  .step-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 1.5px solid currentColor;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; transition: background 0.3s, border-color 0.3s;
+  }
+  .step.active .step-num { background: var(--accent); border-color: var(--accent); color: #0d0f14; }
+  .step.done .step-num { background: var(--surface2); }
+  .step-line { flex: 1; height: 1px; background: var(--border); margin: 0 8px; }
+
+  /* Floating label inputs */
+  .field { position: relative; margin-bottom: 1rem; }
+  .field input {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    padding: 16px 38px 6px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.925rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+  }
+  .field input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(79,255,176,0.08);
+  }
+  .field input:focus + label,
+  .field input:not(:placeholder-shown) + label {
+    transform: translateY(-8px) scale(0.75);
+    color: var(--accent);
+  }
+  .field label {
+    position: absolute; left: 14px; top: 13px;
+    font-size: 0.875rem; color: var(--text-dim);
+    pointer-events: none; transform-origin: left top;
+    transition: transform 0.15s, color 0.15s;
+  }
+  .field input::placeholder { color: transparent; }
+  .field .field-icon {
+    position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim); font-size: 1rem;
+  }
+  .field .field-icon.clickable {
+    cursor: pointer; pointer-events: all;
+    transition: color 0.15s;
+  }
+  .field .field-icon.clickable:hover { color: var(--text); }
+
+  /* Password strength */
+  .strength-bar { display: flex; gap: 4px; margin-top: 6px; }
+  .strength-seg {
+    flex: 1; height: 3px; border-radius: 2px;
+    background: var(--border); transition: background 0.25s;
+  }
+  .strength-label { font-size: 0.7rem; color: var(--text-dim); margin-top: 4px; min-height: 14px; }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+  /* Submit */
+  .submit-btn {
+    width: 100%; padding: 13px;
+    background: var(--accent); color: #0d0f14;
+    border: none; border-radius: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem; font-weight: 700;
+    cursor: pointer; margin-top: 0.5rem;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+    letter-spacing: -0.01em;
+  }
+  .submit-btn:hover {
+    background: #3de89e;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(79,255,176,0.3);
+  }
+  .submit-btn:active { transform: translateY(0); }
+
+  .divider {
+    display: flex; align-items: center; gap: 10px;
+    margin: 1.25rem 0; color: var(--text-dim); font-size: 0.75rem;
+  }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .signin-link { text-align: center; font-size: 0.875rem; color: var(--text-muted); }
+  .signin-link a { color: var(--accent); text-decoration: none; font-weight: 600; }
+  .signin-link a:hover { text-decoration: underline; }
+
+  .flash-container { position: fixed; top: 1.5rem; right: 1.5rem; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+
+  @media (max-width: 768px) { .left-panel { display: none; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="flash-container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="flash flash-{{ cat }}">{% if cat=='success' %}✓{% else %}✕{% endif %} {{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+</div>
+
+<!-- Left Panel -->
+<div class="left-panel">
+  <div class="left-content">
+    <div class="brand">✦ <span>Attend</span>Track</div>
+    <div class="left-headline">
+      Track every<br>class with<br><em>precision.</em>
+    </div>
+    <p class="left-desc">
+      Join thousands of educators managing attendance smarter —
+      no paperwork, no confusion, just clean data.
+    </p>
+    <div class="feature-list">
+      <div class="feature-item"><div class="feature-dot"></div> Multiple class catalogues per teacher</div>
+      <div class="feature-item"><div class="feature-dot"></div> Instant attendance reports & analytics</div>
+      <div class="feature-item"><div class="feature-dot"></div> Date-wise history always accessible</div>
+    </div>
+  </div>
+</div>
+
+<!-- Right Panel -->
+<div class="right-panel">
+  <div class="register-box">
+    <h2>Create account</h2>
+    <p class="sub">Set up your teacher profile in seconds</p>
+
+    <!-- Step indicators -->
+    <div class="steps">
+      <div class="step active" id="step1"><div class="step-num">1</div> Profile</div>
+      <div class="step-line"></div>
+      <div class="step" id="step2"><div class="step-num">2</div> Credentials</div>
+      <div class="step-line"></div>
+      <div class="step" id="step3"><div class="step-num">3</div> Done</div>
+    </div>
+
+    <form method="POST" id="registerForm">
+      <!-- Full Name -->
+      <div class="field">
+        <input type="text" name="full_name" id="full_name" placeholder="Full Name" required autocomplete="name">
+        <label for="full_name">Full Name</label>
+        <span class="field-icon">👤</span>
+      </div>
+
+      <!-- Username -->
+      <div class="field">
+        <input type="text" name="username" id="username" placeholder="Username" required autocomplete="username">
+        <label for="username">Username</label>
+        <span class="field-icon">@</span>
+      </div>
+
+      <!-- Password row -->
+      <div class="field-row">
+        <div class="field">
+          <input type="password" name="password" id="password" placeholder="Password" required autocomplete="new-password">
+          <label for="password">Password</label>
+          <span class="field-icon clickable" id="togglePwd" onclick="toggleVis('password','togglePwd')">👁</span>
+        </div>
+        <div class="field">
+          <input type="password" name="confirm_password" id="confirm" placeholder="Confirm" required autocomplete="new-password">
+          <label for="confirm">Confirm</label>
+          <span class="field-icon clickable" id="toggleCnf" onclick="toggleVis('confirm','toggleCnf')">👁</span>
+        </div>
+      </div>
+
+      <!-- Strength bar -->
+      <div class="strength-bar">
+        <div class="strength-seg" id="s1"></div>
+        <div class="strength-seg" id="s2"></div>
+        <div class="strength-seg" id="s3"></div>
+        <div class="strength-seg" id="s4"></div>
+      </div>
+      <div class="strength-label" id="strengthLabel"></div>
+
+      <br>
+
+      <button type="submit" class="submit-btn">
+        Create my account <span>→</span>
+      </button>
+    </form>
+
+    <div class="divider">or</div>
+    <div class="signin-link">
+      Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function toggleVis(inputId, iconId) {
+    const inp = document.getElementById(inputId);
+    const ico = document.getElementById(iconId);
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    ico.textContent = inp.type === 'password' ? '👁' : '🙈';
+  }
+
+  // Password strength meter
+  const pwdInput = document.getElementById('password');
+  const segs = ['s1','s2','s3','s4'].map(id => document.getElementById(id));
+  const label = document.getElementById('strengthLabel');
+  const colors = ['#ff6b6b','#ffb347','#4fffb0','#4fffb0'];
+  const labels = ['Too short','Weak','Good','Strong'];
+
+  pwdInput.addEventListener('input', () => {
+    const v = pwdInput.value;
+    let score = 0;
+    if (v.length >= 6) score++;
+    if (v.length >= 10) score++;
+    if (/[A-Z]/.test(v) && /[0-9]/.test(v)) score++;
+    if (/[^A-Za-z0-9]/.test(v)) score++;
+    segs.forEach((s, i) => s.style.background = i < score ? colors[score-1] : 'var(--border)');
+    label.textContent = v.length > 0 ? labels[Math.max(0, score-1)] : '';
+    label.style.color = score > 0 ? colors[score-1] : 'var(--text-dim)';
+  });
+
+  // Animate step indicators as user fills in fields
+  const allInputs = document.querySelectorAll('.field input');
+  const steps = [document.getElementById('step1'), document.getElementById('step2'), document.getElementById('step3')];
+
+  allInputs.forEach((inp, i) => {
+    inp.addEventListener('focus', () => {
+      const stepIdx = i < 2 ? 0 : 1;
+      steps.forEach((s, si) => {
+        s.classList.remove('active','done');
+        if (si < stepIdx) s.classList.add('done');
+        if (si === stepIdx) s.classList.add('active');
+      });
+    });
+  });
+
+  // Mark step 3 on submit
+  document.getElementById('registerForm').addEventListener('submit', () => {
+    steps.forEach((s,i) => { s.classList.remove('active','done'); if(i<2) s.classList.add('done'); else s.classList.add('active'); });
+  });
+
+  // Flash dismiss
+  setTimeout(() => {
+    document.querySelectorAll('.flash').forEach(el => {
+      el.style.transition = 'opacity 0.4s'; el.style.opacity = '0';
+      setTimeout(() => el.remove(), 400);
+    });
+  }, 4000);
+</script>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Login — AttendTrack{% endblock %}
+{% block extra_css %}
+<style>
+  body { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .auth-wrapper {
+    width: 100%; max-width: 440px; padding: 2rem;
+    animation: fadeUp 0.4s ease;
+  }
+  @keyframes fadeUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform: translateY(0); } }
+
+  .auth-logo {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem; font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  .auth-logo span { color: var(--text); }
+  .auth-sub { text-align: center; color: var(--text-muted); font-size: 0.875rem; margin-bottom: 2rem; }
+
+  .auth-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow);
+  }
+  .auth-card h2 { font-size: 1.25rem; margin-bottom: 1.5rem; letter-spacing: -0.02em; }
+  .auth-footer { text-align: center; margin-top: 1.25rem; font-size: 0.85rem; color: var(--text-muted); }
+  .auth-footer a { color: var(--accent); text-decoration: none; font-weight: 500; }
+  .auth-footer a:hover { text-decoration: underline; }
+
+  .demo-info {
+    background: rgba(123,97,255,0.08);
+    border: 1px solid rgba(123,97,255,0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    color: #a99dff;
+    margin-top: 1rem;
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .demo-info strong { display: block; margin-bottom: 2px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="flash-container" id="flashContainer">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="flash flash-{{ cat }}">
+        {% if cat == 'success' %}✓{% else %}✕{% endif %} {{ msg }}
+      </div>
+    {% endfor %}
+  {% endwith %}
+</div>
+
+<div class="auth-wrapper">
+  <div class="auth-logo">✦ <span>Attend</span>Track</div>
+  <p class="auth-sub">Smart attendance management for educators</p>
+
+  <div class="auth-card">
+    <h2>Welcome back</h2>
+    <form method="POST">
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input class="form-input" type="text" name="username" placeholder="Enter your username" required autofocus>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" name="password" placeholder="Enter your password" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:11px;">
+        Sign In →
+      </button>
+    </form>
+    <div class="demo-info">
+      ℹ️ <div><strong>Demo credentials</strong> Username: <code>teacher</code> &nbsp; Password: <code>password123</code></div>
+    </div>
+  </div>
+
+  <div class="auth-footer">
+    Don't have an account? <a href="{{ url_for('register') }}">Create one</a>
+  </div>
+</div>
+{% endblock %}

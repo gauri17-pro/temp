@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — AttendTrack{% endblock %}
+{% block extra_css %}
+<style>
+  .catalogue-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+  .cat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    transition: border-color 0.2s, transform 0.2s;
+    text-decoration: none; color: inherit;
+    display: flex; flex-direction: column; gap: 1rem;
+  }
+  .cat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .cat-top { display:flex; justify-content:space-between; align-items:flex-start; }
+  .cat-icon {
+    width:44px; height:44px; border-radius:12px;
+    background: linear-gradient(135deg, rgba(79,255,176,0.15), rgba(123,97,255,0.15));
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.3rem;
+  }
+  .cat-name { font-family:'Syne',sans-serif; font-size:1.05rem; font-weight:700; margin-bottom:3px; }
+  .cat-subject { font-size:0.8rem; color:var(--text-muted); }
+  .cat-footer { display:flex; justify-content:space-between; align-items:center; padding-top:.75rem; border-top:1px solid var(--border); }
+  .cat-stat { font-size:.8rem; color:var(--text-muted); }
+  .cat-stat strong { color: var(--text); font-size:.9rem; }
+  .cat-present { color: var(--present) !important; font-weight:600; }
+
+  .hero-bar {
+    background: linear-gradient(135deg, rgba(79,255,176,0.06), rgba(123,97,255,0.06));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap: wrap; gap: 1rem;
+  }
+  .hero-greeting { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800; letter-spacing:-.02em; }
+  .hero-date { font-size:.85rem; color:var(--text-muted); margin-top:3px; }
+
+  .section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+  .section-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.07em; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+  <div class="hero-bar">
+    <div>
+      <div class="hero-greeting">Good day, {{ teacher.full_name }} 👋</div>
+      <div class="hero-date">{{ today.strftime('%A, %B %d %Y') }}</div>
+    </div>
+    <a href="{{ url_for('new_catalogue') }}" class="btn btn-primary">+ New Catalogue</a>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Catalogues</div>
+      <div class="stat-value purple">{{ stats|length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Students</div>
+      <div class="stat-value">{{ stats | sum(attribute='total_students') }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Present Today</div>
+      <div class="stat-value green">{{ stats | sum(attribute='present_today') }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Absent Today</div>
+      <div class="stat-value red">{{ stats | sum(attribute='total_students') - stats | sum(attribute='present_today') }}</div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">Your Catalogues</div>
+  </div>
+
+  {% if stats %}
+  <div class="catalogue-grid">
+    {% for item in stats %}
+    <a href="{{ url_for('view_catalogue', catalogue_id=item.catalogue.id) }}" class="cat-card">
+      <div class="cat-top">
+        <div>
+          <div class="cat-name">{{ item.catalogue.name }}</div>
+          <div class="cat-subject">📚 {{ item.catalogue.subject }}</div>
+        </div>
+        <div class="cat-icon">🗂</div>
+      </div>
+      <div class="cat-footer">
+        <span class="cat-stat"><strong>{{ item.total_students }}</strong> students</span>
+        <span class="cat-stat">Today: <strong class="cat-present">{{ item.present_today }}</strong> present</span>
+        <span class="badge badge-neutral">{{ item.catalogue.created_at.strftime('%b %Y') }}</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">
+    <div class="empty-icon">📋</div>
+    <h3>No catalogues yet</h3>
+    <p>Create your first attendance catalogue to get started.</p>
+    <br>
+    <a href="{{ url_for('new_catalogue') }}" class="btn btn-primary">+ New Catalogue</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

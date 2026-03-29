@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}AttendTrack{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0f14;
+      --surface: #141720;
+      --surface2: #1c2030;
+      --border: #252a38;
+      --accent: #4fffb0;
+      --accent2: #7b61ff;
+      --accent3: #ff6b6b;
+      --text: #e8ecf4;
+      --text-muted: #7a8196;
+      --text-dim: #4a5166;
+      --present: #4fffb0;
+      --absent: #ff6b6b;
+      --radius: 12px;
+      --radius-lg: 18px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* ── Navbar ── */
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-brand {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-brand span { color: var(--text); }
+
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+
+    .nav-user {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 18px;
+      border: none; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.18s ease;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #0d0f14;
+    }
+    .btn-primary:hover { background: #3de89e; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(79,255,176,0.3); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: var(--text-dim); background: var(--surface2); }
+    .btn-danger {
+      background: transparent;
+      color: var(--absent);
+      border: 1px solid rgba(255,107,107,0.3);
+      font-size: 0.8rem;
+      padding: 5px 12px;
+    }
+    .btn-danger:hover { background: rgba(255,107,107,0.1); }
+    .btn-sm { padding: 5px 12px; font-size: 0.8rem; }
+    .btn-icon { padding: 7px; border-radius: 8px; }
+
+    /* ── Layout ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+    .page { padding: 2.5rem 0 4rem; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+    }
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-title { font-size: 1rem; font-weight: 700; }
+
+    /* ── Flash messages ── */
+    .flash-container {
+      position: fixed; top: 72px; right: 1.5rem; z-index: 999;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .flash {
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      display: flex; align-items: center; gap: 8px;
+      animation: slideIn 0.25s ease;
+      max-width: 360px;
+      backdrop-filter: blur(8px);
+    }
+    .flash-success { background: rgba(79,255,176,0.12); border: 1px solid rgba(79,255,176,0.3); color: var(--accent); }
+    .flash-error   { background: rgba(255,107,107,0.12); border: 1px solid rgba(255,107,107,0.3); color: var(--absent); }
+    @keyframes slideIn { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform: translateX(0); } }
+
+    /* ── Forms ── */
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
+    .form-label { font-size: 0.8rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .form-input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 10px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.925rem;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+    .form-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,255,176,0.1); }
+    .form-input::placeholder { color: var(--text-dim); }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 600;
+    }
+    .badge-present { background: rgba(79,255,176,0.12); color: var(--present); }
+    .badge-absent  { background: rgba(255,107,107,0.12); color: var(--absent); }
+    .badge-neutral { background: var(--surface2); color: var(--text-muted); }
+
+    /* ── Page Header ── */
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; }
+    .page-header p { color: var(--text-muted); margin-top: 4px; }
+    .breadcrumb { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 8px; display: flex; gap: 6px; align-items: center; }
+    .breadcrumb a { color: var(--text-muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--accent); }
+
+    /* ── Stat Card ── */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+    }
+    .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500; }
+    .stat-value { font-family: 'Poppins', sans-serif; font-size: 2rem; font-weight: 800; margin-top: 4px; letter-spacing: -0.02em; }
+    .stat-value.green { color: var(--present); }
+    .stat-value.purple { color: var(--accent2); }
+    .stat-value.red { color: var(--absent); }
+
+    /* ── Empty State ── */
+    .empty {
+      text-align: center; padding: 3rem 2rem;
+      color: var(--text-muted);
+    }
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+    .empty h3 { font-size: 1.1rem; margin-bottom: 6px; color: var(--text); }
+    .empty p { font-size: 0.875rem; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── Tooltip ── */
+    [data-tip] { position: relative; }
+    [data-tip]:hover::after {
+      content: attr(data-tip);
+      position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); font-size: 0.75rem; padding: 4px 10px; border-radius: 6px;
+      white-space: nowrap; pointer-events: none;
+    }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if session.teacher_id %}
+<nav>
+  <a href="{{ url_for('dashboard') }}" class="nav-brand">
+    ✦ <span>Attend</span>Track
+  </a>
+  <div class="nav-right">
+    <div class="nav-user">
+      <div class="nav-avatar">{{ session.teacher_name[0] }}</div>
+      <span>{{ session.teacher_name }}</span>
+    </div>
+    <a href="{{ url_for('logout') }}" class="btn btn-ghost btn-sm">Logout</a>
+  </div>
+</nav>
+{% endif %}
+
+<!-- Flash Messages -->
+<div class="flash-container" id="flashContainer">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="flash flash-{{ cat }}">
+        {% if cat == 'success' %}✓{% else %}✕{% endif %} {{ msg }}
+      </div>
+    {% endfor %}
+  {% endwith %}
+</div>
+
+{% block content %}{% endblock %}
+
+<script>
+  // Auto-dismiss flash messages
+  setTimeout(() => {
+    document.querySelectorAll('.flash').forEach(el => {
+      el.style.transition = 'opacity 0.4s, transform 0.4s';
+      el.style.opacity = '0';
+      el.style.transform = 'translateX(20px)';
+      setTimeout(() => el.remove(), 400);
+    });
+  }, 4000);
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>
